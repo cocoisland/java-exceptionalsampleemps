@@ -1,77 +1,33 @@
-Exceptions are disruptions to the ordinary flow of the application. Thus when something happens that is an exception to the normal operation of your application, we have an exception! Exceptions can take on many forms
+# Java Exception
+> Exceptions are disruptions to the ordinary flow of the application. Thus when something happens that is an exception to the normal operation of your application
 
-Application Error
-The file, environment variable we seek is not found
-The API tries doing an invalid math expression
-The API loses accesses to the webserver
-User Error
-Looking for resources that are not available
-Using an endpoint that does not exist
-Sending the API the wrong data type
-Aliens
-Ok, maybe not aliens. However, there always seems to be some one off situation that causes a weird exception!
-Spring Boot has a default way of handling exceptions. It does this fairly well. Up until now we have just used the Spring Boot defaults to handle our exceptions. What if we wanted to provide some custom error messages when our program encounters an error? What if we have custom ways we want to handle exceptions that differ from the Spring Boot Default? We will be coding some custom exception handlers below.
+> Spring Boot has a default way of handling exceptions. 
+* To provide some custom error messages when our program encounters an error, some custom exception handlers below.
 
-Our application experiences two types of exceptions
+> Two types of exceptions
 
-System generated. Something happened we were not excepting. The client sent us a String value when we were expecting an integer. These are handled in this objective.
-Thrown exceptions. Something happened we knew might happen so we reported manually by “throwing” an exception. The client looked for a resource that was not available. These are handled in the objective on Java Exception Constructs.
-When we are writing our custom exception handles we need to handle both types.
+**System generated.** 
+> Thrown exceptions. The client looked for a resource that was not available. 
+> Need a way to report information back to the client in a standard way. In this way, our client need only address one type of error message. We need to let the client know
 
-We also need a way to report information back to the client in a standard way. In this way, our client need only address one type of error message. We need to let the client know
+* What is the exception
+* What caused the exception
+* What time the exception happened
+* Any data types that are incorrect or missing
+* Among other information that might vary by exception type.
 
-What is the exception
-What caused the exception
-What time the exception happened
-Any data types that are incorrect or missing
-Among other information that might vary by exception type.
-Terminology
 
-When an exception happens, it is considered thrown. We throw a ResourceNotFound exception. The system throws a FileNotFound exception.
-When we handle an exception, it is considered caught. We will catch any thrown exceptions!
-So let’s “catch” all possible exceptions and report to the client what happened. Spring Boot will handle continuing the application causing it to wait for the next request!
+> When an exception happens, it is considered thrown. We throw a ResourceNotFound exception. The system throws a FileNotFound exception.
 
-Note that another reason we look at Exception Handling is here we really take advantage of annotations to control the flow of our programs and the object oriented ness of Java to make our code reusable. So pay particular attention to the flow the application throughout this objective!
+> Run the application and surf to these endpoints to see what default exception handling looks like. You can expand each endpoint to see its output
 
-Follow Along
-Open up the application exceptionalsampleemp-initial from the GitHub Repository https://github.com/LambdaSchool/java-exceptionalsampleemps.git. This application is the same as the application from https://github.com/LambdaSchool/java-sampleemps.git/sampleemps_data_modeling with the addition of find employee by id endpoints and associated code.
+* Wrong Data Type: http://localhost:2019/employees/employee/lambda
+* Invalid endpoint: http://localhost:2019/employees/turtle
 
-Run the application and surf to these endpoints to see what default exception handling looks like. You can expand each endpoint to see its output
+**Set up our Models**
+> Add a model called ErrorDetail to report exception. Do note that this is NOT annotated as an Entity. The data for this model will never appear in the database. This is just a POJO we are using internally in our application. 
 
-Wrong Data Type: http://localhost:2019/employees/employee/lambda
-
-{
-    "timestamp": "2020-05-20 17:32:14",
-    "status": 400,
-    "error": "Bad Request",
-    "message": "Failed to convert value of type 'java.lang.String' to required type 'long'; nested exception is java.lang.NumberFormatException: For input string: \"lambda\"",
-    "trace": "org.springframework.web.method.annotation.MethodArgumentTypeMismatchException: Failed to convert value of type 'java.lang.String' to required type 'long'; nested exception is java.lang.NumberFormatException: For input string: \"lambda\"\n\tat org.springframework.web.method.annotation.AbstractNamedValueMethodArgumentResolver.resolveArgument(AbstractNamedValueMethodArgumentResolver.java:133)\n\tat org.springframework.web.method.support.HandlerMethodArgumentResolverComposite.resolveArgument(HandlerMethodArgumentResolverComposite.java:121)\n\tat org.springframework.web.method.support.InvocableHandlerMethod.getMethodArgumentValues(InvocableHandlerMethod.java:167)\n\tat org.springframework.web.method.support.InvocableHandlerMethod.invokeForRequest(InvocableHandlerMethod.java:134)\n\tat org.springframework.web.servlet.mvc.method.annotation.ServletInvocableHandlerMethod.invokeAndHandle(ServletInvocableHandlerMethod.java:106)\n\tat org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.invokeHandlerMethod(RequestMappingHandlerAdapter.java:888)\n\tat org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.handleInternal(RequestMappingHandlerAdapter.java:793)\n\tat org.springframework.web.servlet.mvc.method.AbstractHandlerMethodAdapter.handle(AbstractHandlerMethodAdapter.java:87)\n\tat org.springframework.web.servlet.DispatcherServlet.doDispatch(DispatcherServlet.java:1040)\n\tat org.springframework.web.servlet.DispatcherServlet.doService(DispatcherServlet.java:943)\n\tat org.springframework.web.servlet.FrameworkServlet.processRequest(FrameworkServlet.java:1006)\n\tat org.springframework.web.servlet.FrameworkServlet.doGet(FrameworkServlet.java:898)\n\tat javax.servlet.http.HttpServlet.service(HttpServlet.java:634)\n\tat org.springframework.web.servlet.FrameworkServlet.service(FrameworkServlet.java:883)\n\tat javax.servlet.http.HttpServlet.service(HttpServlet.java:741)\n\tat org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:231)\n\tat org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:166)\n\tat org.apache.tomcat.websocket.server.WsFilter.doFilter(WsFilter.java:53)\n\tat org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:193)\n\tat org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:166)\n\tat org.springframework.web.filter.RequestContextFilter.doFilterInternal(RequestContextFilter.java:100)\n\tat org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:119)\n\tat org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:193)\n\tat org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:166)\n\tat org.springframework.web.filter.FormContentFilter.doFilterInternal(FormContentFilter.java:93)\n\tat org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:119)\n\tat org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:193)\n\tat org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:166)\n\tat org.springframework.web.filter.CharacterEncodingFilter.doFilterInternal(CharacterEncodingFilter.java:201)\n\tat org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:119)\n\tat org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:193)\n\tat org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:166)\n\tat org.apache.catalina.core.StandardWrapperValve.invoke(StandardWrapperValve.java:202)\n\tat org.apache.catalina.core.StandardContextValve.invoke(StandardContextValve.java:96)\n\tat org.apache.catalina.authenticator.AuthenticatorBase.invoke(AuthenticatorBase.java:526)\n\tat org.apache.catalina.core.StandardHostValve.invoke(StandardHostValve.java:139)\n\tat org.apache.catalina.valves.ErrorReportValve.invoke(ErrorReportValve.java:92)\n\tat org.apache.catalina.core.StandardEngineValve.invoke(StandardEngineValve.java:74)\n\tat org.apache.catalina.connector.CoyoteAdapter.service(CoyoteAdapter.java:343)\n\tat org.apache.coyote.http11.Http11Processor.service(Http11Processor.java:367)\n\tat org.apache.coyote.AbstractProcessorLight.process(AbstractProcessorLight.java:65)\n\tat org.apache.coyote.AbstractProtocol$ConnectionHandler.process(AbstractProtocol.java:860)\n\tat org.apache.tomcat.util.net.NioEndpoint$SocketProcessor.doRun(NioEndpoint.java:1591)\n\tat org.apache.tomcat.util.net.SocketProcessorBase.run(SocketProcessorBase.java:49)\n\tat java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1128)\n\tat java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:628)\n\tat org.apache.tomcat.util.threads.TaskThread$WrappingRunnable.run(TaskThread.java:61)\n\tat java.base/java.lang.Thread.run(Thread.java:834)\nCaused by: java.lang.NumberFormatException: For input string: \"lambda\"\n\tat java.base/java.lang.NumberFormatException.forInputString(NumberFormatException.java:65)\n\tat java.base/java.lang.Long.parseLong(Long.java:692)\n\tat java.base/java.lang.Long.valueOf(Long.java:1144)\n\tat org.springframework.util.NumberUtils.parseNumber(NumberUtils.java:214)\n\tat org.springframework.beans.propertyeditors.CustomNumberEditor.setAsText(CustomNumberEditor.java:115)\n\tat org.springframework.beans.TypeConverterDelegate.doConvertTextValue(TypeConverterDelegate.java:429)\n\tat org.springframework.beans.TypeConverterDelegate.doConvertValue(TypeConverterDelegate.java:402)\n\tat org.springframework.beans.TypeConverterDelegate.convertIfNecessary(TypeConverterDelegate.java:155)\n\tat org.springframework.beans.TypeConverterSupport.convertIfNecessary(TypeConverterSupport.java:73)\n\tat org.springframework.beans.TypeConverterSupport.convertIfNecessary(TypeConverterSupport.java:53)\n\tat org.springframework.validation.DataBinder.convertIfNecessary(DataBinder.java:693)\n\tat org.springframework.web.method.annotation.AbstractNamedValueMethodArgumentResolver.resolveArgument(AbstractNamedValueMethodArgumentResolver.java:125)\n\t... 47 more\n",
-    "path": "/employees/employee/lambda"
-}
-Employee Not Found: http://localhost:2019/employees/employee/9999
-
-{
-    "timestamp": "2020-05-20 17:35:09",
-    "status": 500,
-    "error": "Internal Server Error",
-    "message": "Employee id 9999 not found",
-    "trace": "javax.persistence.EntityNotFoundException: Employee id 9999 not found\n\tat com.lambdaschool.sampleemps.services.EmployeeServiceImpl.lambda$findEmployeeById$0(EmployeeServiceImpl.java:35)\n\tat java.base/java.util.Optional.orElseThrow(Optional.java:408)\n\tat com.lambdaschool.sampleemps.services.EmployeeServiceImpl.findEmployeeById(EmployeeServiceImpl.java:35)\n\tat com.lambdaschool.sampleemps.services.EmployeeServiceImpl$$FastClassBySpringCGLIB$$4105708a.invoke(<generated>)\n\tat org.springframework.cglib.proxy.MethodProxy.invoke(MethodProxy.java:218)\n\tat org.springframework.aop.framework.CglibAopProxy$CglibMethodInvocation.invokeJoinpoint(CglibAopProxy.java:769)\n\tat org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:163)\n\tat org.springframework.aop.framework.CglibAopProxy$CglibMethodInvocation.proceed(CglibAopProxy.java:747)\n\tat org.springframework.transaction.interceptor.TransactionAspectSupport.invokeWithinTransaction(TransactionAspectSupport.java:366)\n\tat org.springframework.transaction.interceptor.TransactionInterceptor.invoke(TransactionInterceptor.java:99)\n\tat org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:186)\n\tat org.springframework.aop.framework.CglibAopProxy$CglibMethodInvocation.proceed(CglibAopProxy.java:747)\n\tat org.springframework.aop.framework.CglibAopProxy$DynamicAdvisedInterceptor.intercept(CglibAopProxy.java:689)\n\tat com.lambdaschool.sampleemps.services.EmployeeServiceImpl$$EnhancerBySpringCGLIB$$b166ea5a.findEmployeeById(<generated>)\n\tat com.lambdaschool.sampleemps.controllers.EmployeeController.getEmployeeById(EmployeeController.java:37)\n\tat java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)\n\tat java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)\n\tat java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)\n\tat java.base/java.lang.reflect.Method.invoke(Method.java:566)\n\tat org.springframework.web.method.support.InvocableHandlerMethod.doInvoke(InvocableHandlerMethod.java:190)\n\tat org.springframework.web.method.support.InvocableHandlerMethod.invokeForRequest(InvocableHandlerMethod.java:138)\n\tat org.springframework.web.servlet.mvc.method.annotation.ServletInvocableHandlerMethod.invokeAndHandle(ServletInvocableHandlerMethod.java:106)\n\tat org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.invokeHandlerMethod(RequestMappingHandlerAdapter.java:888)\n\tat org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.handleInternal(RequestMappingHandlerAdapter.java:793)\n\tat org.springframework.web.servlet.mvc.method.AbstractHandlerMethodAdapter.handle(AbstractHandlerMethodAdapter.java:87)\n\tat org.springframework.web.servlet.DispatcherServlet.doDispatch(DispatcherServlet.java:1040)\n\tat org.springframework.web.servlet.DispatcherServlet.doService(DispatcherServlet.java:943)\n\tat org.springframework.web.servlet.FrameworkServlet.processRequest(FrameworkServlet.java:1006)\n\tat org.springframework.web.servlet.FrameworkServlet.doGet(FrameworkServlet.java:898)\n\tat javax.servlet.http.HttpServlet.service(HttpServlet.java:634)\n\tat org.springframework.web.servlet.FrameworkServlet.service(FrameworkServlet.java:883)\n\tat javax.servlet.http.HttpServlet.service(HttpServlet.java:741)\n\tat org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:231)\n\tat org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:166)\n\tat org.apache.tomcat.websocket.server.WsFilter.doFilter(WsFilter.java:53)\n\tat org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:193)\n\tat org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:166)\n\tat org.springframework.web.filter.RequestContextFilter.doFilterInternal(RequestContextFilter.java:100)\n\tat org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:119)\n\tat org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:193)\n\tat org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:166)\n\tat org.springframework.web.filter.FormContentFilter.doFilterInternal(FormContentFilter.java:93)\n\tat org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:119)\n\tat org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:193)\n\tat org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:166)\n\tat org.springframework.web.filter.CharacterEncodingFilter.doFilterInternal(CharacterEncodingFilter.java:201)\n\tat org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:119)\n\tat org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:193)\n\tat org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:166)\n\tat org.apache.catalina.core.StandardWrapperValve.invoke(StandardWrapperValve.java:202)\n\tat org.apache.catalina.core.StandardContextValve.invoke(StandardContextValve.java:96)\n\tat org.apache.catalina.authenticator.AuthenticatorBase.invoke(AuthenticatorBase.java:526)\n\tat org.apache.catalina.core.StandardHostValve.invoke(StandardHostValve.java:139)\n\tat org.apache.catalina.valves.ErrorReportValve.invoke(ErrorReportValve.java:92)\n\tat org.apache.catalina.core.StandardEngineValve.invoke(StandardEngineValve.java:74)\n\tat org.apache.catalina.connector.CoyoteAdapter.service(CoyoteAdapter.java:343)\n\tat org.apache.coyote.http11.Http11Processor.service(Http11Processor.java:367)\n\tat org.apache.coyote.AbstractProcessorLight.process(AbstractProcessorLight.java:65)\n\tat org.apache.coyote.AbstractProtocol$ConnectionHandler.process(AbstractProtocol.java:860)\n\tat org.apache.tomcat.util.net.NioEndpoint$SocketProcessor.doRun(NioEndpoint.java:1591)\n\tat org.apache.tomcat.util.net.SocketProcessorBase.run(SocketProcessorBase.java:49)\n\tat java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1128)\n\tat java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:628)\n\tat org.apache.tomcat.util.threads.TaskThread$WrappingRunnable.run(TaskThread.java:61)\n\tat java.base/java.lang.Thread.run(Thread.java:834)\n",
-    "path": "/employees/employee/9999"
-}
-Invalid endpoint: http://localhost:2019/employees/turtle
-
-{
-    "timestamp": "2020-05-20 17:35:38",
-    "status": 404,
-    "error": "Not Found",
-    "message": "No message available",
-    "path": "/employees/turtle"
-}
-There is nothing wrong with this output but we can do better, provide more meaningful output to our clients.
-
-Set up our Models
-Let’s add the models needed to report exception, error messages back to the client. You can modify these as you wish for your applications. However, for now, let’s use this code. Add a model called ErrorDetail using the following code. Do note that this is NOT annotated as an Entity. The data for this model will never appear in the database. This is just a POJO we are using internally in our application. Remember in adding all of this code, you will need to make sure the proper imports are done!
-
+```java
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -150,10 +106,12 @@ public class ErrorDetail
         this.errors = errors;
     }
 }
-Notice that ErrorDetail references ValidationError. This is a class we create to hold any data validation errors that might arise. This is NOT the ValidationErrors from the Spring Framework so don’t mistakenly import that class!
+```
+**ErrorDetail references ValidationError** 
+> This is a class we create to hold any data validation errors that might arise. This is NOT the ValidationErrors from the Spring Framework so don’t mistakenly import that class!
 
-Let’s now add the ValidationError models using the following code. Again, do note that this is NOT annotated as an Entity. The data for this model will never appear in the database. This is just a POJO we are using internally in our application.
-
+> Add the ValidationError models. Do note that this is NOT annotated as an Entity. The data for this model will never appear in the database. This is just a POJO we are using internally in our application.
+```java
 public class ValidationError
 {
     private String Code;
@@ -185,19 +143,22 @@ public class ValidationError
         return "ValidationError{" + "Code='" + Code + '\'' + ", message='" + message + '\'' + '}';
     }
 }
-Turn off Default Exception Handling
-Now we need to turn off the default exception handling of the Spring Framework. We will do this through an application property. However, after turning it off we need to handle manually all exceptions and reporting the information to the client that we want to report.
+```
+**Turn off Default Exception Handling**
+> Now we need to turn off the default exception handling of the Spring Framework. We will do this through an application property. However, after turning it off we need to handle manually all exceptions and reporting the information to the client that we want to report.
 
-Application Properities
-Let’s add the appropriate code to application.properities. These turn off default exception handling including handling incorrect endpoints. Specifically this will alway us to custom that default exception handling. The default exception handling is still present but uses our own customizations. That is what we mean by “turn off” default exception handling. We also need to turn static resource handling to capture unknown endpoints. So add the following lines to the application.properties file
-
+**Application Properities**
+> Turn off default exception handling including handling incorrect endpoints. Specifically this will alway us to custom that default exception handling. The default exception handling is still present but uses our own customizations. We also need to turn static resource handling to capture unknown endpoints. So add the following lines to the application.properties file
+```java
 ### Turns off Spring Boot automatic exception handling
 server.error.whitelabel.enabled=false
 spring.mvc.throw-exception-if-no-handler-found=true
 spring.resources.add-mappings=false
-Mapping for Swagger
-Since we have turned off static resource handling, we need to manually add the static paths for Swagger, the only valid static paths in our application. Add a class under config called SwaggerWebMVC. Then add the following code to the class. Feel free not to add the comments! This is boilerplate code that needs to be added to any application that uses custom exception handling and Swagger.
-
+```
+**Mapping for Swagger**
+> Since we have turned off static resource handling, we need to manually add the static paths for Swagger, the only valid static paths in our application. 
+> Add a class under config called **SwaggerWebMVC**. This is boilerplate code that needs to be added to any application that uses custom exception handling and Swagger.
+```java
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
@@ -230,11 +191,13 @@ public class SwaggerWebMVC implements WebMvcConfigurer
             .addResourceLocations("classpath:/META-INF/resources/webjars/");
     }
 }
-Manual /error endpoint handling
-We have turned off default error handling. Now let’s handle the exceptions. Some errors get routed to the endpoint /error. We need to change what /error reports to the client to our format.
+```
+**Manual /error endpoint handling**
+> We have turned off default error handling. Now let’s handle the exceptions. Some errors get routed to the endpoint /error. We need to change what /error reports to the client to our format.
 
-Create a new subpackage under sampleemps called exceptions. Under that subpackge create a class called CustomErrorDetails. Then add the following code to that class. If future applications, you would modify what gets reported here to match what is in the ErrorDetail class. That way all our exceptions will report the same format of messages! Be careful that you import the right class for DefaultErrorAttributes!!!
-
+> Create a new subpackage under sampleemps called exceptions. 
+> Under that subpackge create a class called **CustomErrorDetails**. If future applications, you would modify what gets reported here to match what is in the ErrorDetail class. That way all our exceptions will report the same format of messages! Be careful that you import the right class for DefaultErrorAttributes!!!
+```java
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.servlet.error.DefaultErrorAttributes;
 import org.springframework.stereotype.Component;
@@ -272,8 +235,10 @@ public class CustomErrorDetails
         return errorDetails;
     }
 }
-This class uses a HelperFunction class. This class contains helpful methods that are used throughout the application. We will create a method that populates the validation constraint errors. We will use such a function in a few places throughout the application. Create a new subpackage under sampleemps called handlers. Create a class in that subpackage called HelperFunctions. Add the following code to that class.
-
+```
+> This class uses a **HelperFunction** class. This class contains helpful methods that are used throughout the application. We will create a method that populates the validation constraint errors. We will use such a function in a few places throughout the application. 
+> Create a new subpackage under sampleemps called handlers and create a class in that subpackage called HelperFunctions. 
+```java
 import com.lambdaschool.sampleemps.models.ValidationError;
 import org.springframework.stereotype.Component;
 
@@ -314,8 +279,9 @@ public class HelperFunctions
         return listVE;
     }
 }
+```
 Run the application and surf to these endpoints to see what exception handling now looks like. You can expand each endpoint to see its output
-
+```java
 Wrong Data Type: http://localhost:2019/employees/employee/lambda
 
 {
@@ -346,15 +312,16 @@ Invalid endpoint: http://localhost:2019/employees/turtle
     "developerMessage": "path: /employees/turtle",
     "errors": []
 }
-There is nothing wrong with this output but we can still do better. We get more specific about each type of error.
+```
+> There is nothing wrong with this output but we can still do better. We get more specific about each type of error.
 
-Unpredicted Exceptions
-Let’s change the message that get returned when we encounter an exception we have not handled, a catch all for all exceptions! Under the handlers subpackage, add a class called RestExceptionHandler. Here we will put code to address specific types of errors. Add the following code to the class to better handle invalid endpoint exceptions. This class extends the abstract class ResponseEntityExceptionHandler. We will override some methods from this abstract while leaving others at their default implementation.
+**Unpredicted Exceptions**
+> Let’s change the message that get returned when we encounter an exception we have not handled, a catch all for all exceptions! Under the handlers subpackage, add a class called **RestExceptionHandler**. This class extends the abstract class ResponseEntityExceptionHandler. We will override some methods from this abstract while leaving others at their default implementation.
 
-Note the RestControllerAdvice annotation. When an exception is encountered during a Rest Controller operation, that Rest Controller seeks advice from an advice class on how to handle that exception. If no advice is found, it uses the default exception handling built into Spring including the modifications we have made to that default exception handling.
+> Note the RestControllerAdvice annotation. When an exception is encountered during a Rest Controller operation, that Rest Controller seeks advice from an advice class on how to handle that exception. If no advice is found, it uses the default exception handling built into Spring including the modifications we have made to that default exception handling.
 
 We do use the helper function to fill in data validation constraint exceptions so need to autowire that in!
-
+```java
 import com.lambdaschool.sampleemps.models.ErrorDetail;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.Ordered;
@@ -412,8 +379,9 @@ public class RestExceptionHandler
                 status);
     }
 }
-Run the application and surf to these endpoints to see what exception handling now looks like. You can expand each endpoint to see its output
-
+```
+> Run the application and surf to these endpoints to see what exception handling now looks like. You can expand each endpoint to see its output
+```java
 Wrong data type: http://localhost:2019/employees/employee/lambda
 
 {
@@ -444,17 +412,8 @@ Invalid endpoint: http://localhost:2019/employees/turtle
     "developerMessage": "path: /employees/turtle",
     "errors": []
 }
-Dig Deeper
-Java Fundamentals Tutorial: Exceptions
-Java Fundamentals Tutorial: Exceptions
-Learn to implement exception handling using a variety of Java constructs
+```
 
-Overview
-See the Github Repository https://github.com/LambdaSchool/java-exceptionalsampleemps.git for the code used in the objective.
-Software Needed
-Java Development Kit (JDK) - at least version 11
-JetBrains IntelliJ IDEA IDE
-Postman
 What if we want to programmatically cause an exception? What if we want to stop the ordinary flow of our application and report that to our clients? To do this, we can throw an exception or use a try..catch statement. We have already thrown built-in exceptions. For example, look at the code for delete in the class EmployeeServiceImpl.
 
     public void delete(long employeeid)
