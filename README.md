@@ -1,31 +1,22 @@
 # Java Exception
-> Exceptions are disruptions to the ordinary flow of the application. Thus when something happens that is an exception to the normal operation of your application
+> Exceptions are disruptions to the ordinary flow of the application.
 
 > Spring Boot has a default way of handling exceptions. 
 * To provide some custom error messages when our program encounters an error, some custom exception handlers below.
 
 > Two types of exceptions
 
-**System generated.** 
-> Thrown exceptions. The client looked for a resource that was not available. 
-> Need a way to report information back to the client in a standard way. In this way, our client need only address one type of error message. We need to let the client know
+**System generated.**  Exception.
 
+> Exception that client needs to know.
 * What is the exception
 * What caused the exception
 * What time the exception happened
 * Any data types that are incorrect or missing
 * Among other information that might vary by exception type.
 
-
-> When an exception happens, it is considered thrown. We throw a ResourceNotFound exception. The system throws a FileNotFound exception.
-
-> Run the application and surf to these endpoints to see what default exception handling looks like. You can expand each endpoint to see its output
-
-* Wrong Data Type: http://localhost:2019/employees/employee/lambda
-* Invalid endpoint: http://localhost:2019/employees/turtle
-
 **Set up our Models**
-> Add a model called ErrorDetail to report exception. Do note that this is NOT annotated as an Entity. The data for this model will never appear in the database. This is just a POJO we are using internally in our application. 
+> Add a model called **ErrorDetail** to report exception. Do note that this is NOT annotated as an Entity. The data for this model will never appear in the database. This is just a POJO we are using internally in our application. 
 
 ```java
 import java.util.ArrayList;
@@ -414,8 +405,8 @@ Invalid endpoint: http://localhost:2019/employees/turtle
 }
 ```
 
-What if we want to programmatically cause an exception? What if we want to stop the ordinary flow of our application and report that to our clients? To do this, we can throw an exception or use a try..catch statement. We have already thrown built-in exceptions. For example, look at the code for delete in the class EmployeeServiceImpl.
-
+> What if we want to programmatically cause an exception? What if we want to stop the ordinary flow of our application and report that to our clients? To do this, we can throw an exception or use a try..catch statement. We have already thrown built-in exceptions. For example, look at the code for delete in the class EmployeeServiceImpl.
+```java
     public void delete(long employeeid)
     {
         if (employeerepos.findById(employeeid)
@@ -427,16 +418,18 @@ What if we want to programmatically cause an exception? What if we want to stop 
             throw new EntityNotFoundException("Employee " + employeeid + " Not Found");
         }
     }
-Here we use throw new EntityNotFoundException("Employee " + employeeid + " Not Found"); which throws the built-in exception EntityNotFoundException.
+```
+> Here we use throw new EntityNotFoundException("Employee " + employeeid + " Not Found"); which throws the built-in exception EntityNotFoundException.
 
 In the method findEmployeeById we call a method called .orElseThrow which throws the EntityNotFoundException as well.
-
+```java
     public Employee findEmployeeById(long id) throws
             EntityNotFoundException
     {
         return employeerepos.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Employee id " + id + " not found"));
     }
+```
 Java also includes the Try..Catch statement. This statement tries to run the code in the body. If all works, great! If not an exception is thrown, either by us, Java, or the Spring Framework, and the catch part gets executed. You can even have a finally part that will get executed no matter what.
 
 try
@@ -449,30 +442,9 @@ try
 {
     // no matter what, do these statements
 }
-Notice that with catch we say which exception we wish to catch. Above we use Exception e to represent all exceptions. However, if we want to handle different exceptions differently, we can do that! In the following exception, we address an IOException, a SQLException and then all other exceptions differently.
 
-try
-{
-    // the statements to try
-} catch (SQLException e)
-{
-    System.out.println("Error processing database");
-} catch (IOException e)
-{
-    System.out.println("We could not find your file");
-} catch (Exception e)
-{
-    System.out.println("Ouch. That did not work!" + e);
-} finally
-{
-    // no matter what, do these statements
-}
-Follow Along
-Create our own exception
-Let’s create our own exception that we can throw and look at how try..catch statements work in Java. Let’s add each example to our exceptionalsampleemps application we started in the previous objective.
-
-If you haven’t already, open the application exceptionalsampleemps you worked on in the previous objective on Exception Handling. Let’s create our own exception we can throw. Under the subpackage exceptions, create a class called ResourceNotFoundException. This is the name of the exception we are going to create. Add the following code to that class. Remember in adding all of this code, you will need to make sure the proper imports are done!
-
+> Under the subpackage exceptions, create a class called ResourceNotFoundException. 
+```java
 public class ResourceNotFoundException
     extends RuntimeException
 {
@@ -481,10 +453,11 @@ public class ResourceNotFoundException
         super("Error from a Lambda School Application " + message);
     }
 }
-The difference between this exception and the built-in exception EntityNotFoundException is the name and that the error message will contain the phrase “Error from a Lambda School Application”. Really, I am just showing this is possible!
+```
+> The difference between this exception and the built-in exception EntityNotFoundException is the name and that the error message will contain the phrase “Error from a Lambda School Application”. Really, I am just showing this is possible!
 
-Now let’s handle this custom exception. Add the following code to the bottom of the RestExceptionHandler class under the subpackage handlers.
-
+> Now let’s handle this custom exception. Add the following code to the bottom of the RestExceptionHandler class under the subpackage handlers.
+```java
     // annotation to say the following method is meant to handle any time the ResourceNotFoundException is thrown
     @ExceptionHandler(ResourceNotFoundException.class)
     public ResponseEntity<?> handleResourceNotFoundException(ResourceNotFoundException rnfe)
@@ -502,16 +475,12 @@ Now let’s handle this custom exception. Add the following code to the bottom o
             null,
             HttpStatus.NOT_FOUND);
     }
-Thus we have an annotation saying which method will handle ResourceNotFoundExceptions. We put the messages we want to return to the client in our ErrorDetail model and then we return that object to the client. Now we have to throw the ResourceNotFoundException in our code instead of the EntityNotFoundException. So open the EmployeeServiceImpl and the class and do a replace, replacing EntityNotFoundException with ResourceNotFoundException. Do the same thing with JobTitleServiceImpl!
+```
+> Replace EntityNotFoundException with ResourceNotFoundException in EmployeeServiceImpl in order to return
+the messages we want to the client in our ErrorDetail model.
 
-Hint to replace code, with the correct file selected,
-
-go to Edit -> Find -> Replace.
-In the find box, the first one, enter EntityNotFoundException
-In the replace box, the second one, enter ResourceNotFoundException
-Click on Replace all
-Let’s see what happens now when we try to find an employee that is not there. Run the application exceptionalsampleemps. Surf to the following endpoint. Expand the endpoint to see its output.
-
+> Surf to the following endpoint to see the new exception messages.
+```java
 Resource Not Found: http://localhost:2019/employees/employee/9999
 
 {
@@ -522,11 +491,12 @@ Resource Not Found: http://localhost:2019/employees/employee/9999
     "developerMessage": "com.lambdaschool.sampleemps.exceptions.ResourceNotFoundException",
     "errors": []
 }
-Try..Catch statements
-To see how a try..catch works in action, let’s try to read from an environment variable on our local system. we use a system method System.getenv().
+```
+**Try..Catch statements**
+> Read from an environment variable on our local system. we use a system method System.getenv().
 
-Change the main class, SampleempsApplication, to try and read in an environment variable called LAMBDA. So the main class will look like this in the end.
-
+> Change the main class, SampleempsApplication, to try and read in an environment variable called LAMBDA. So the main class will look like this in the end.
+```java
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
@@ -550,32 +520,14 @@ public class SampleempsApplication
         }
     }
 }
-Run the application. In your IntelliJ console, you will see the value of the environment variable in upper case if it is set on your system. If it is not set, you will see the message no such environment variable. Either way the program will continue. Try working with the environment variable PATH and see what happens! Do note you get the output twice, once from the regular run of the application and once from the DevTools run of the application.
+```
 
-Challenge
-Following the same process you used to create a ResourceNotFoundException, create a ResourceFoundException to be used in place of the built-in exception EntityExistsException.
 
-Learn to use data validation annotations to verify data prior to processing the data
-
-Overview
-See the Github Repository https://github.com/LambdaSchool/java-exceptionalsampleemps.git for the code used in the objective.
-Software Needed
-Java Development Kit (JDK) - at least version 11
-JetBrains IntelliJ IDEA IDE
-Postman
-We as backend developers are responsible for the integrity of the data in our systems. Clients will send up garbage at times. That might be due to a system problem or some initial act to sabotage our database. We cannot rely on the data we receive to be valid. We must first validate the data before it gets saved and used in our system.
-
-Did the client send up a String when we needed an integer?
-Did the client send us duplicates of a field that must be unique?
-Did the client send us a poorly formatted email address?
-And the list goes on.
-Do NOT rely on clients to send you reasonable data. Data validation is our responsibility. I think I have said that enough but know I have many horror stories of “interesting” data from clients. Validate your own data! We have been doing this all along. We just did not label it as data validation. For example
-
-Java is strongly typed. If we expect an integer and get a String, Java itself will cause an exception, and we know how to handle exceptions!
-We use the @Column annotation to say if a column is required or must be unique across records.
-We use setters to convert or validate our data before it goes to the database.
-So, much data validation we get for “free” with Java Spring. Data validation is baked into the language and framework. However, certain annotations are available for use to further validate data. These are found in the import javax.validation.constraints and are put right before the fields in the models whose values we want to restrict. We can even add our own exception message using the message attribute. Some of these include:
-
+> Java is strongly typed. 
+* Use the @Column annotation to say if a column is required or must be unique across records.
+* Use setters to convert or validate our data before it goes to the database.
+* the import javax.validation.constraints are put right before the fields in the models whose values we want to restrict. 
+```java
 @Email(message = "must be a valid email") forces the field to be in a valid email format (username@domain.toplevel). If not, a message for “must be a valid email” is returned.
 @Size(min = ??, max = ??) restricts the size of a String field.
 @Min(value = ??) minimum value of an integer. Often used in conjunction with @Max
@@ -586,10 +538,10 @@ So, much data validation we get for “free” with Java Spring. Data validation
 @Negative must be a negative number
 @NotNull another way to validate whether a field can be null or not
 @Future date must be in the future
-@Pattern(value = "regex") allows you specific a regex pattern to use to validate the data! Discussing regex patterns are beyond the scope of this module. See additional resources for more information.
-Follow Along
-If you haven’t already, open the application exceptionalsampleemps you worked on in the previous objectives on Exception Handling. In the Employee Model, right before the salary field, add the appropriate annotations for a minimum salary of 100,000 and a maximum salary of 120,000. So your code will look something like this. Remember in adding all of this code, you will need to make sure the proper imports are done!
-
+@Pattern(value = "regex") allows you specific a regex pattern to use to validate the data! 
+```
+> In the Employee Model, right before the salary field, add the appropriate annotations for a minimum salary of 100,000 and a maximum salary of 120,000. 
+```java
 // ...
 
     @Transient
@@ -600,8 +552,9 @@ If you haven’t already, open the application exceptionalsampleemps you worked 
     private double salary;
 
 // ...
-Now run your application. In your console window you will see an error message similar to the following.
-
+```
+> Now run your application. In your console window you will see an error message similar to the following.
+```java
 Caused by: javax.persistence.RollbackException: Error while committing the transaction
     at org.hibernate.internal.ExceptionConverterImpl.convertCommitException(ExceptionConverterImpl.java:81) ~[hibernate-core-5.4.9.Final.jar:5.4.9.Final]
     at org.hibernate.engine.transaction.internal.TransactionImpl.commit(TransactionImpl.java:104) ~[hibernate-core-5.4.9.Final.jar:5.4.9.Final]
@@ -612,27 +565,7 @@ List of constraint violations:[
     ConstraintViolationImpl{interpolatedMessage='must be greater than or equal to 100000.0', propertyPath=salary, rootBeanClass=class com.lambdaschool.sampleemps.models.Employee, messageTemplate='{javax.validation.constraints.DecimalMin.message}'}
 ]
     at org.hibernate.cfg.beanvalidation.BeanValidationEventListener.validate(BeanValidationEventListener.java:140) ~[hibernate-core-5.4.9.Final.jar:5.4.9.Final]
-    at org.hibernate.cfg.beanvalidation.BeanValidationEventListener.onPreInsert(BeanValidationEventListener.java:80) ~[hibernate-core-5.4.9.Final.jar:5.4.9.Final]
-    at org.hibernate.action.internal.EntityInsertAction.preInsert(EntityInsertAction.java:211) ~[hibernate-core-5.4.9.Final.jar:5.4.9.Final]
-    at org.hibernate.action.internal.EntityInsertAction.execute(EntityInsertAction.java:84) ~[hibernate-core-5.4.9.Final.jar:5.4.9.Final]
-    at org.hibernate.engine.spi.ActionQueue.executeActions(ActionQueue.java:604) ~[hibernate-core-5.4.9.Final.jar:5.4.9.Final]
-    at org.hibernate.engine.spi.ActionQueue.lambda$executeActions$1(ActionQueue.java:478) ~[hibernate-core-5.4.9.Final.jar:5.4.9.Final]
-    at java.base/java.util.LinkedHashMap.forEach(LinkedHashMap.java:684) ~[na:na]
-    at org.hibernate.engine.spi.ActionQueue.executeActions(ActionQueue.java:475) ~[hibernate-core-5.4.9.Final.jar:5.4.9.Final]
-    at org.hibernate.event.internal.AbstractFlushingEventListener.performExecutions(AbstractFlushingEventListener.java:348) ~[hibernate-core-5.4.9.Final.jar:5.4.9.Final]
-    at org.hibernate.event.internal.DefaultFlushEventListener.onFlush(DefaultFlushEventListener.java:40) ~[hibernate-core-5.4.9.Final.jar:5.4.9.Final]
-    at org.hibernate.event.service.internal.EventListenerGroupImpl.fireEventOnEachListener(EventListenerGroupImpl.java:108) ~[hibernate-core-5.4.9.Final.jar:5.4.9.Final]
-    at org.hibernate.internal.SessionImpl.doFlush(SessionImpl.java:1344) ~[hibernate-core-5.4.9.Final.jar:5.4.9.Final]
-    at org.hibernate.internal.SessionImpl.managedFlush(SessionImpl.java:435) ~[hibernate-core-5.4.9.Final.jar:5.4.9.Final]
-    at org.hibernate.internal.SessionImpl.flushBeforeTransactionCompletion(SessionImpl.java:3221) ~[hibernate-core-5.4.9.Final.jar:5.4.9.Final]
-    at org.hibernate.internal.SessionImpl.beforeTransactionCompletion(SessionImpl.java:2389) ~[hibernate-core-5.4.9.Final.jar:5.4.9.Final]
-    at org.hibernate.engine.jdbc.internal.JdbcCoordinatorImpl.beforeTransactionCompletion(JdbcCoordinatorImpl.java:447) ~[hibernate-core-5.4.9.Final.jar:5.4.9.Final]
-    at org.hibernate.resource.transaction.backend.jdbc.internal.JdbcResourceLocalTransactionCoordinatorImpl.beforeCompletionCallback(JdbcResourceLocalTransactionCoordinatorImpl.java:183) ~[hibernate-core-5.4.9.Final.jar:5.4.9.Final]
-    at org.hibernate.resource.transaction.backend.jdbc.internal.JdbcResourceLocalTransactionCoordinatorImpl.access$300(JdbcResourceLocalTransactionCoordinatorImpl.java:40) ~[hibernate-core-5.4.9.Final.jar:5.4.9.Final]
-    at org.hibernate.resource.transaction.backend.jdbc.internal.JdbcResourceLocalTransactionCoordinatorImpl$TransactionDriverControlImpl.commit(JdbcResourceLocalTransactionCoordinatorImpl.java:281) ~[hibernate-core-5.4.9.Final.jar:5.4.9.Final]
-    at org.hibernate.engine.transaction.internal.TransactionImpl.commit(TransactionImpl.java:101) ~[hibernate-core-5.4.9.Final.jar:5.4.9.Final]
-    ... 21 common frames omitted
-These annotations are a great way to further validate your data!
-
-Challenge
-Add an annotation to validate the email field in the Email model. Note that since the word email is already in use in the method, IntelliJ adds the full address of the annotation to give you something like @javax.validation.constraints.Email. It happens when these common words are used. We have to know which one to use at what time!
+    ...
+ ```
+  
+> These annotations are a great way to further validate your data!
